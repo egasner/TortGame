@@ -5,14 +5,20 @@ using UnityEngine;
 public class TurtleMovement : MonoBehaviour
 {
 
+    public Rigidbody rb;
     public Transform transforms;
-    private double currRotationSpeed;
-    private double currLinearVelocity;
-    [SerializeField] double maxRotationValue;
-    [SerializeField] double RaccelerationRate;
+    private float currRotationSpeed;
+    private float currLinearVelocity;
+    private bool grounded;
+    public Vector3 jump;
 
-    [SerializeField] double maxVelocity;
-    [SerializeField] double LaccelerationRate;
+    [SerializeField] float jumpPower;
+
+    [SerializeField] float maxRotationValue;
+    [SerializeField] float RaccelerationRate;
+
+    [SerializeField] float maxVelocity;
+    [SerializeField] float LaccelerationRate;
 
 
 
@@ -20,7 +26,8 @@ public class TurtleMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+        jump = new Vector3(0.0f, 2.0f, 0.0f);
+        grounded = true;
     }
 
 
@@ -30,9 +37,19 @@ public class TurtleMovement : MonoBehaviour
         updateRotationSpeed();
         updateRotation();
         updateLinearVelocity();
-        UpdatePosition();
+        updatePosition();
+        jumpListener();
+        
+
+    }
 
 
+    void jumpListener() {
+        if (Input.GetKeyDown(KeyCode.Space) && grounded)
+        {
+            rb.AddForce(jump * jumpPower, ForceMode.VelocityChange);
+            
+        }
     }
 
 
@@ -57,9 +74,9 @@ public class TurtleMovement : MonoBehaviour
 
     }
 
-    void UpdatePosition() {
-        double xAmount;
-        double zAmount;
+    void updatePosition() {
+        float xAmount;
+        float zAmount;
         int angle = (int)transforms.rotation.y;
 
         while (angle < 0) { angle += 360; }
@@ -69,10 +86,12 @@ public class TurtleMovement : MonoBehaviour
         xAmount = currLinearVelocity * Mathf.Sin(angle);
 
 
-       
+        Debug.Log("curr Vel: " + currLinearVelocity+ " x: " + currLinearVelocity * Mathf.Sin(angle) + " z: " + zAmount);
 
         transforms.Translate((float)xAmount * Time.deltaTime, 0, (float)zAmount * Time.deltaTime);
 
+        /*rb.velocity = new Vector3(xAmount, 0, zAmount);*/
+        
 
     }
 
@@ -98,6 +117,8 @@ public class TurtleMovement : MonoBehaviour
     }
 
     void updateRotation() {
-        transforms.Rotate(0, (float)currRotationSpeed * Time.deltaTime, 0);
+        /*transforms.Rotate(0, (float)currRotationSpeed * Time.deltaTime, 0);*/
+
+        rb.angularVelocity = new Vector3(0, currRotationSpeed, 0); 
     }
 }
